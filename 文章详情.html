@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web前端学习总结 - 个人博客</title>
+    <style>
+        /* 全局样式重置与基础配置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            line-height: 1.8;
+            letter-spacing: 0.5px;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 导航栏样式 */
+        nav {
+            background-color: #2c3e50;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            color: #fff;
+            font-size: 20px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .nav-menu {
+            display: flex;
+            list-style: none;
+        }
+        .nav-menu li {
+            margin-left: 30px;
+        }
+        .nav-menu a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .nav-menu a:hover, .nav-menu a.active {
+            color: #3498db;
+        }
+        .back-btn {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            border: 1px solid #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        .back-btn:hover {
+            background-color: #fff;
+            color: #2c3e50;
+        }
+
+        /* 文章头部样式 */
+        .article-header {
+            padding: 40px 0;
+            border-bottom: 1px solid #eaeaea;
+            margin-bottom: 30px;
+        }
+        .article-title {
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .article-meta {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+        .article-tags {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .tag {
+            background-color: #3498db;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            text-decoration: none;
+        }
+
+        /* 文章主体样式 */
+        .article-content {
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+        .article-content h2 {
+            font-size: 24px;
+            margin: 30px 0 15px;
+            color: #2c3e50;
+        }
+        .article-content p {
+            margin-bottom: 20px;
+            text-indent: 2em;
+        }
+        .article-content ul, .article-content ol {
+            margin: 20px 0 20px 40px;
+        }
+        .article-content li {
+            margin-bottom: 10px;
+        }
+        /* 代码块样式 */
+        pre {
+            background-color: #2d2d2d;
+            color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        code {
+            font-family: "Consolas", monospace;
+            font-size: 14px;
+        }
+        /* 图片样式 */
+        figure {
+            margin: 30px 0;
+            text-align: center;
+        }
+        figure img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        figure img:hover {
+            transform: translateY(-5px);
+        }
+        figcaption {
+            margin-top: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+        /* 引用块样式 */
+        blockquote {
+            border-left: 4px solid #3498db;
+            padding: 15px 20px;
+            background-color: #eef7fa;
+            margin: 20px 0;
+            font-style: italic;
+        }
+
+        /* 文章底部样式 */
+        .article-footer {
+            padding: 30px 0;
+            border-top: 1px solid #eaeaea;
+            margin-bottom: 40px;
+        }
+        .article-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .prev-article, .next-article {
+            color: #3498db;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .share-btns {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .share-btn {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 50%;
+            color: #fff;
+            background-color: #666;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .share-btn.weibo {
+            background-color: #e6162d;
+        }
+        .share-btn.wechat {
+            background-color: #07c160;
+        }
+        .share-btn.qq {
+            background-color: #12b7f5;
+        }
+        .share-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* 评论区样式 */
+        .comment-section {
+            padding: 30px 0;
+            border-top: 1px solid #eaeaea;
+            margin-bottom: 40px;
+        }
+        .comment-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .comment-list {
+            margin-bottom: 30px;
+        }
+        .comment-item {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .comment-author {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .comment-time {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 10px;
+        }
+        .comment-form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        .submit-btn {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .submit-btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* 页脚样式 */
+        footer {
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 40px 0;
+            text-align: center;
+        }
+        .footer-info {
+            margin-bottom: 20px;
+        }
+        .copyright {
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            .article-title {
+                font-size: 24px;
+            }
+            .article-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav>
+        <div class="container nav-container">
+            <a href="index.html" class="logo">我的个人博客</a>
+            <ul class="nav-menu">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="文章列表.html">文章列表</a></li>
+                <li><a href="作品集.html">作品集</a></li>
+                <li><a href="关于我.html">关于我</a></li>
+                <li><a href="文章详情.html" class="active">文章详情</a></li>
+            </ul>
+            <a href="文章列表.html" class="back-btn">返回文章列表</a>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="container">
+        <!-- 文章头部 -->
+        <article>
+            <header class="article-header">
+                <h1 class="article-title">Web前端学习总结：HTML5与CSS3实战技巧</h1>
+                <div class="article-meta">
+                    <time datetime="2026-01-08">发布时间：2026-01-08</time>
+                    <time datetime="2026-01-09">更新时间：2026-01-09</time>
+                </div>
+                <div class="article-tags">
+                    <a href="#" class="tag">HTML5</a>
+                    <a href="#" class="tag">CSS3</a>
+                    <a href="#" class="tag">前端学习</a>
+                </div>
+            </header>
+
+            <!-- 文章主体 -->
+            <div class="article-content">
+                <p>随着互联网技术的飞速发展，Web前端开发成为了IT领域中炙手可热的方向。HTML5和CSS3作为前端开发的核心技术，带来了更丰富的语义化标签和强大的样式能力，让网页开发更加高效、灵活。本文将结合实战项目，总结HTML5语义化布局和CSS3高级样式的使用技巧。</p>
+                
+                <h2>一、HTML5语义化标签的应用</h2>
+                <p>HTML5摒弃了传统的div+class的布局方式，引入了<code>article</code>、<code>section</code>、<code>header</code>、<code>footer</code>等语义化标签，让页面结构更清晰，同时提升了SEO和可访问性。</p>
+                
+                <blockquote>
+                    语义化标签的核心价值在于：让机器能读懂页面结构，让开发者能快速理解代码意图。
+                </blockquote>
+                
+                <p>在博客项目中，我们可以这样组织文章结构：</p>
+                <pre><code>&lt;article&gt;
+    &lt;header&gt;文章标题与元信息&lt;/header&gt;
+    &lt;section&gt;文章正文部分&lt;/section&gt;
+    &lt;footer&gt;文章底部导航&lt;/footer&gt;
+&lt;/article&gt;</code></pre>
+
+                <h2>二、CSS3 Flex/Grid布局实战</h2>
+                <p>CSS3的Flex和Grid布局解决了传统浮动布局的痛点，Flex适合一维布局，Grid适合二维布局，两者结合能实现复杂的页面排版。</p>
+                
+                <figure>
+                    <img src="8.jpg" alt="Flex与Grid布局对比">
+                    <figcaption>图1：Flex布局（左）与Grid布局（右）效果对比</figcaption>
+                </figure>
+                
+                <h2>三、CSS3动效与交互优化</h2>
+                <p>利用CSS3的<code>transition</code>和<code>transform</code>属性，可以实现流畅的hover动效，比如图片上浮、按钮变色等，提升用户体验。</p>
+                
+                <ul>
+                    <li>图片悬浮上浮：<code>transform: translateY(-5px);</code></li>
+                    <li>按钮渐变变色：<code>transition: background-color 0.3s ease;</code></li>
+                    <li>文字渐显效果：结合<code>opacity</code>和过渡实现</li>
+                </ul>
+            </div>
+
+            <!-- 文章底部 -->
+            <footer class="article-footer">
+                <div class="article-nav">
+                    <a href="#" class="prev-article">&lt; 上一篇：CSS3动画基础教程</a>
+                    <a href="#" class="next-article">下一篇：JavaScript DOM操作实战 &gt;</a>
+                </div>
+                <div class="share-btns">
+                    <a href="#" class="share-btn weibo">微</a>
+                    <a href="#" class="share-btn wechat">微</a>
+                    <a href="#" class="share-btn qq">Q</a>
+                </div>
+            </footer>
+        </article>
+
+        <!-- 评论区 -->
+        <section class="comment-section">
+            <h2 class="comment-title">评论区</h2>
+            <div class="comment-list">
+                <div class="comment-item">
+                    <div class="comment-author">小明</div>
+                    <div class="comment-time">2026-01-08 10:00</div>
+                    <div class="comment-content">写得很详细，对我学习前端帮助很大！</div>
+                </div>
+                <div class="comment-item">
+                    <div class="comment-author">小红</div>
+                    <div class="comment-time">2026-01-08 11:30</div>
+                    <div class="comment-content">请问Grid布局的兼容性怎么样？</div>
+                </div>
+            </div>
+            <form class="comment-form">
+                <div class="form-group">
+                    <label for="name">姓名</label>
+                    <input type="text" id="name" required placeholder="请输入您的姓名">
+                </div>
+                <div class="form-group">
+                    <label for="email">邮箱</label>
+                    <input type="email" id="email" required placeholder="请输入您的邮箱">
+                </div>
+                <div class="form-group">
+                    <label for="content">评论内容</label>
+                    <textarea id="content" required placeholder="请输入您的评论"></textarea>
+                </div>
+                <button type="submit" class="submit-btn">提交评论</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-info">
+                <p>个人博客 | 专注Web前端技术分享</p>
+                <p>联系方式：example@mail.com</p>
+            </div>
+            <div class="copyright">
+                © 2026 我的个人博客 版权所有
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

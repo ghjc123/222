@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的作品集 - 个人博客网站项目展示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --light-gray: #f5f5f5;
+            --dark-gray: #7f8c8d;
+        }
+        /* 导航栏样式 */
+        .navbar {
+            background: var(--primary-color);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .nav-menu {
+            display: flex;
+            list-style: none;
+        }
+        .nav-item {
+            margin-left: 2rem;
+        }
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            padding: 0.5rem 0;
+            position: relative;
+        }
+        /* 作品集页面高亮标识 */
+        .nav-link.active {
+            color: var(--accent-color);
+        }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent-color);
+        }
+        /* 作品数量统计 */
+        .work-count {
+            color: #fff;
+            background: var(--accent-color);
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        /* 筛选区域样式 */
+        .filter-section {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+        .filter-header {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+        /* 分类按钮 */
+        .category-btn {
+            padding: 0.5rem 1.2rem;
+            border: 1px solid var(--accent-color);
+            background: transparent;
+            color: var(--accent-color);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .category-btn.active {
+            background: var(--accent-color);
+            color: #fff;
+        }
+        .category-btn:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
+        /* 搜索框 */
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        .search-input {
+            width: 100%;
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        .search-input:focus {
+            border-color: var(--accent-color);
+        }
+        .search-icon {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--dark-gray);
+        }
+        /* 排序选项 */
+        .sort-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+            color: var(--primary-color);
+        }
+
+        /* 项目卡片网格 */
+        .project-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            /* CSS Grid高级应用：auto-fill + minmax实现响应式 */
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+        .project-card {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            /* 卡片等高解决方案 */
+            min-height: 100%;
+        }
+        /* 卡片悬停效果 */
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .card-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .card-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+             flex-direction: column;
+        }
+        .card-title {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.8rem;
+        }
+        .card-desc {
+            color: var(--dark-gray);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .tag {
+            padding: 0.2rem 0.6rem;
+            background: var(--light-gray);
+            color: var(--primary-color);
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        .card-links {
+            display: flex;
+            gap: 1rem;
+        }
+        .card-link {
+            text-decoration: none;
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .card-link:hover {
+            text-decoration: underline;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: #fff;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 8px;
+            padding: 2rem;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark-gray);
+        }
+        .modal-img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        .modal-title {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        .modal-desc {
+            line-height: 1.8;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+        .modal-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* 页脚样式 */
+        .footer {
+            background: var(--primary-color);
+            color: #fff;
+            padding: 3rem 2rem;
+            margin-top: 5rem;
+        }
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+        .footer-stat {
+            flex: 1;
+            min-width: 200px;
+        }
+        .stat-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .stat-value {
+            font-size: 2rem;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        .footer-nav {
+            flex: 1;
+            min-width: 200px;
+        }
+        .footer-nav-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .footer-nav-list {
+            list-style: none;
+        }
+        .footer-nav-item {
+            margin-bottom: 0.5rem;
+        }
+        .footer-nav-link {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .footer-nav-link:hover {
+            color: var(--accent-color);
+        }
+        /* 回到顶部按钮 */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 40px;
+            height: 40px;
+            background: var(--accent-color);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 响应式断点策略：移动端优先 */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            .filter-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .search-box {
+                width: 100%;
+            }
+            .project-grid {
+                grid-template-columns: 1fr;
+            }
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+            .modal-img {
+                height: 200px;
+            }
+        }
+    </style>
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">我的博客</a>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">首页</a>
+                </li>
+                <li class="nav-item">
+                    <a href="文章列表.html" class="nav-link">文章列表</a>
+                </li>
+                <li class="nav-item">
+                    <a href="作品集.html" class="nav-link active">作品集</a>
+                </li>
+                <li class="nav-item">
+                    <a href="关于我.html" class="nav-link">关于我</a>
+                </li>
+                <li class="nav-item">
+                    <a href="文章详情.html" class="nav-link">文章详情</a>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 筛选区域 -->
+    <section class="filter-section" id="filterSection">
+        <h2 class="filter-header">我的项目作品</h2>
+        <div class="filter-controls">
+            <!-- 分类按钮 -->
+            <button class="category-btn active" data-category="all">全部</button>
+            <button class="category-btn" data-category="web">Web应用</button>
+            <button class="category-btn" data-category="mobile">移动端</button>
+            <button class="category-btn" data-category="course">课程设计</button>
+            
+            <!-- 搜索框 -->
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" id="searchInput" placeholder="搜索项目名称/技术栈...">
+            </div>
+            
+            <!-- 排序选项 -->
+            <select class="sort-select" id="sortSelect">
+                <option value="latest">最新发布</option>
+                <option value="oldest">最早发布</option>
+            </select>
+        </div>
+    </section>
+
+    <!-- 项目卡片网格 -->
+    <section class="project-grid" id="projectGrid">
+        <!-- 项目1 -->
+        <div class="project-card" data-category="web" data-name="个人博客网站" data-tags="HTML5,CSS3,JavaScript">
+            <img src="2.jpeg" alt="个人博客网站" class="card-img">
+            <div class="card-content">
+                <h3 class="card-title">个人博客网站</h3>
+                <p class="card-desc">基于HTML5语义化结构搭建，使用CSS3 Grid/Flex实现响应式布局，包含文章展示、评论、作品集等功能模块。</p>
+                <div class="card-tags">
+                    <span class="tag">HTML5</span>
+                    <span class="tag">CSS3</span>
+                    <span class="tag">JavaScript</span>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- 项目2 -->
+        <div class="project-card" data-category="mobile" data-name="移动端新闻资讯页" data-tags="HTML5,CSS3,移动端适配">
+            <img src="3.jpg" alt="移动端新闻资讯页" class="card-img">
+            <div class="card-content">
+                <h3 class="card-title"></h3>
+                <p class="card-desc">一个可视化CSS Grid布局生成工具，允许用户通过拖拽界面创建复杂的网格布局，并实时生成CSS代码。</p>
+                <div class="card-tags">
+                    <span class="tag">HTML5</span>
+                    <span class="tag">CSS3</span>
+                    <span class="tag">移动端适配</span>
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 项目3 -->
+        <div class="project-card" data-category="course" data-name="学生管理系统前端" data-tags="HTML5,JavaScript,Bootstrap">
+            <img src="4.jpg" alt="学生管理系统前端" class="card-img">
+            <div class="card-content">
+                <h3 class="card-title">学生管理系统前端</h3>
+                <p class="card-desc">课程设计项目，基于Bootstrap框架开发的学生信息管理系统前端界面，包含登录、数据展示、增删改查等功能。</p>
+                <div class="card-tags">
+                    <span class="tag">HTML5</span>
+                    <span class="tag">JavaScript</span>
+                    <span class="tag">Bootstrap</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 项目4 -->
+        <div class="project-card" data-category="web" data-name="电商商品展示页" data-tags="HTML5,CSS3,Grid布局">
+            <img src="7.jpg" alt="电商商品展示页" class="card-img">
+            <div class="card-content">
+                <h3 class="card-title">电商商品展示页</h3>
+                <p class="card-desc">使用CSS3 Grid实现商品网格布局，包含商品筛选、排序、详情弹窗等功能，适配电脑、平板、手机等设备。</p>
+                <div class="card-tags">
+                    <span class="tag">HTML5</span>
+                    <span class="tag">CSS3</span>
+                    <span class="tag">Grid布局</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 项目5 -->
+        <div class="project-card" data-category="mobile" data-name="移动端点餐小程序页面" data-tags="HTML5,CSS3,Vue.js">
+            <img src="5.jpg" alt="移动端点餐小程序页面" class="card-img">
+            <div class="card-content">
+                <h3 class="card-title">移动端点餐小程序页面</h3>
+                <p class="card-desc">基于Vue.js开发的移动端点餐页面，实现菜品分类、购物车、菜品详情等功能，适配各种手机屏幕。</p>
+                <div class="card-tags">
+                    <span class="tag">HTML5</span>
+                    <span class="tag">CSS3</span>
+                    <span class="tag">Vue.js</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 项目6 -->
+        <div class="project-card" data-category="course" data-name="校园论坛网站" data-tags="HTML5,PHP,MySQL">
+            <img src="6.jpg" alt="校园论坛网站" class="card-img">
+            <div class="card-content">
+                <h3 class="card-title">校园论坛网站</h3>
+                <p class="card-desc">课程设计综合项目，使用HTML5搭建前端界面，PHP+MySQL实现后端功能，包含发帖、回帖、用户管理等模块。</p>
+                <div class="card-tags">
+                    <span class="tag">HTML5</span>
+                    <span class="tag">PHP</span>
+                    <span class="tag">MySQL</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 项目详情模态框 -->
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <img src="" alt="项目详情图" class="modal-img" id="modalImg">
+            <h2 class="modal-title" id="modalTitle"></h2>
+            <p class="modal-desc" id="modalDesc"></p>
+            <div class="modal-tags" id="modalTags"></div>
+            <div class="card-links">
+                <a href="https://github.com" target="_blank" class="card-link"><i class="fab fa-github"></i> 查看源码</a>
+                <a href="#" class="card-link"><i class="fas fa-external-link-alt"></i> 在线演示</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-container">
+            <!-- 项目统计 -->
+            <div class="footer-stat">
+                <h3 class="stat-title">项目统计</h3>
+                <p class="stat-value" id="footerWorkCount">6</p>
+                <p>已完成项目</p>
+                <p class="stat-value">3</p>
+                <p>Web应用项目</p>
+                <p class="stat-value">2</p>
+                <p>移动端项目</p>
+                <p class="stat-value">1</p>
+                <p>课程设计项目</p>
+            </div>
+
+            <!-- 快速导航 -->
+            <div class="footer-nav">
+                <h3 class="footer-nav-title">快速导航</h3>
+                <ul class="footer-nav-list">
+                    <li class="footer-nav-item"><a href="index.html" class="footer-nav-link">首页</a></li>
+                    <li class="footer-nav-item"><a href="文章列表.html" class="footer-nav-link">文章列表</a></li>
+                    <li class="footer-nav-item"><a href="作品集.html" class="footer-nav-link">作品集</a></li>
+                    <li class="footer-nav-item"><a href="关于我.html" class="footer-nav-link">关于我</a></li>
+                    <li class="footer-nav-item"><a href="文章详情.html" class="footer-nav-link">文章详情</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 回到顶部按钮 -->
+    <a href="#" class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></a>
+
+    <script>
+        // 模态框相关功能
+        const modal = document.getElementById('projectModal');
+        const modalImg = document.getElementById('modalImg');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalTags = document.getElementById('modalTags');
+
+        // 打开模态框
+        function openModal(title, imgSrc, desc, tags) {
+            modalTitle.textContent = title;
+            modalImg.src = imgSrc;
+            modalDesc.textContent = desc;
+            // 渲染标签
+            modalTags.innerHTML = '';
+            const tagList = tags.split(',');
+            tagList.forEach(tag => {
+                const tagElement = document.createElement('span');
+                tagElement.className = 'tag';
+                tagElement.textContent = tag;
+                modalTags.appendChild(tagElement);
+            });
+            modal.style.display = 'flex';
+            // 禁止页面滚动
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            modal.style.display = 'none';
+            // 恢复页面滚动
+            document.body.style.overflow = 'auto';
+        }
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // 筛选和搜索功能
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        const searchInput = document.getElementById('searchInput');
+        const sortSelect = document.getElementById('sortSelect');
+        const projectCards = document.querySelectorAll('.project-card');
+
+        // 分类筛选
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 移除所有活跃状态
+                categoryBtns.forEach(b => b.classList.remove('active'));
+                // 添加当前活跃状态
+                btn.classList.add('active');
+                const category = btn.getAttribute('data-category');
+                filterProjects(category, searchInput.value);
+            });
+        });
+
+        // 搜索功能
+        searchInput.addEventListener('input', () => {
+            const activeCategory = document.querySelector('.category-btn.active').getAttribute('data-category');
+            filterProjects(activeCategory, searchInput.value);
+        });
+
+        // 排序功能
+        sortSelect.addEventListener('change', () => {
+            const activeCategory = document.querySelector('.category-btn.active').getAttribute('data-category');
+            filterProjects(activeCategory, searchInput.value);
+            sortProjects(sortSelect.value);
+        });
+
+        // 筛选项目函数
+        function filterProjects(category, searchTerm) {
+            projectCards.forEach(card => {
+                const cardCategory = card.getAttribute('data-category');
+                const cardName = card.getAttribute('data-name').toLowerCase();
+                const cardTags = card.getAttribute('data-tags').toLowerCase();
+                const searchLower = searchTerm.toLowerCase();
+
+                const isCategoryMatch = category === 'all' || cardCategory === category;
+                const isSearchMatch = cardName.includes(searchLower) || cardTags.includes(searchLower);
+
+                if (isCategoryMatch && isSearchMatch) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // 排序项目函数
+        function sortProjects(sortType) {
+            const grid = document.getElementById('projectGrid');
+            const cards = Array.from(grid.querySelectorAll('.project-card'));
+
+            // 根据排序类型排序
+            if (sortType === 'latest') {
+                cards.reverse();
+            } else if (sortType === 'oldest') {
+                // 保持原顺序
+            }
+
+            // 重新渲染卡片
+            grid.innerHTML = '';
+            cards.forEach(card => grid.appendChild(card));
+        }
+
+        // 回到顶部功能
+        const backToTopBtn = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        });
+
+        backToTopBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的个人博客 - 首页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        /* 基础样式 */
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        ul {
+            list-style: none;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 导航栏样式 */
+        header {
+            background-color: #2d3748;
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        /* 桌面端导航 */
+        .main-nav {
+            display: flex;
+            gap: 2rem;
+        }
+        .main-nav a {
+            padding: 0.5rem 0;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+        .main-nav a:hover {
+            border-color: #4299e1;
+        }
+        /* 移动端汉堡菜单 */
+        .hamburger {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        /* 响应式导航 */
+        @media (max-width: 768px) {
+            .main-nav {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 200px;
+                height: 100vh;
+                background-color: #2d3748;
+                flex-direction: column;
+                padding: 3rem 2rem;
+                gap: 1.5rem;
+                transition: right 0.3s;
+            }
+            .main-nav.active {
+                right: 0;
+            }
+            .hamburger {
+                display: block;
+            }
+        }
+
+        /* 个人信息区域 */
+        .profile-section {
+            padding: 4rem 0;
+            text-align: center;
+            background-color: white;
+        }
+        @keyframes float {
+             0% {
+                 transform: translateY(0); /* 初始位置 */
+             }
+             50% {
+                 transform: translateY(-20px); /* 向上移动20px */
+             }
+             100% {
+                 transform: translateY(0); /* 回到初始位置 */
+             }
+         }
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #e2e8f0;
+            margin-bottom: 1rem;
+            animation: float 2s ease-in-out infinite;}
+        .profile-motto {
+            font-size: 1.2rem;
+            color: #4a5568;
+            margin: 1rem 0;
+        }
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .social-links a {
+            font-size: 1.5rem;
+            color: #4299e1;
+            transition: color 0.3s;
+        }
+        .social-links a:hover {
+            color: #2563eb;
+        }
+
+        /* 精选文章展示区 */
+        .articles-section {
+            padding: 4rem 0;
+        }
+        .section-title {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #2d3748;
+        }
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .article-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            transition: transform 0.3s;
+        }
+        .article-card:hover {
+            transform: translateY(-5px);
+        }
+        .article-title {
+            font-size: 1.2rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+        .article-date {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 1rem;
+        }
+        .article-desc {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        .read-more {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #4299e1;
+            color: white;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .read-more:hover {
+            background-color: #2563eb;
+        }
+
+        /* 标签云区域 */
+        .tags-section {
+            padding: 4rem 0;
+            background-color: white;
+        }
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .tag {
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            background-color: #e2e8f0;
+            color: #2d3748;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .footer-social a:hover {
+            color: #4299e1;
+        }
+    </style>
+    <!-- 引入字体图标（社交图标用） -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <header>
+        <div class="container nav-wrapper">
+            <div class="logo">我的博客</div>
+            <!-- 汉堡菜单按钮 -->
+            <div class="hamburger" id="hamburger">
+                <i class="fas fa-bars"></i>
+            </div>
+            <!-- 主导航 -->
+            <ul class="main-nav" id="mainNav">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="文章列表.html">文章列表</a></li>
+                <li><a href="作品集.html">作品集</a></li>
+                <li><a href="关于我.html">关于我</a></li>
+                <li><a href="文章详情.html">文章详情</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- 个人信息区域 -->
+    <section class="profile-section">
+        <div class="container">
+            <img src="1.jpg" alt="个人头像" class="profile-avatar">
+            <h2>钟智轩</h2>
+            <p class="profile-motto">大家好，我是钟智轩</p>
+            <p>一名全栈开发者与科技博主，热爱分享编程知识、技术心得与生活感悟。在这里，记录我的学习旅程与技术思考。</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-weixin"></i></a>
+                <a href="#"><i class="fab fa-bilibili"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 精选文章展示区 -->
+    <section class="articles-section">
+        <div class="container">
+            <h2 class="section-title">精选文章</h2>
+            <div class="articles-grid">
+                <!-- 文章1 -->
+                <div class="article-card">
+                    <h3 class="article-title">HTML+CSS 响应式布局实战</h3>
+                    <p class="article-date">2026-01-05</p>
+                    <p class="article-desc">本文详细讲解了使用Flex和Grid实现响应式布局的核心技巧，结合实战案例让你快速掌握适配不同设备的方法。</p>
+                    <a href="#" class="read-more">阅读更多</a>
+                </div>
+                <!-- 文章2 -->
+                <div class="article-card">
+                    <h3 class="article-title">JavaScript 数组方法全解析</h3>
+                    <p class="article-date">2026-01-02</p>
+                    <p class="article-desc">从基础到进阶，梳理JS数组的常用方法，包括map、filter、reduce等，附实际应用场景示例。</p>
+                    <a href="#" class="read-more">阅读更多</a>
+                </div>
+                <!-- 文章3 -->
+                <div class="article-card">
+                    <h3 class="article-title">前端工程化之Webpack入门</h3>
+                    <p class="article-date">2025-12-28</p>
+                    <p class="article-desc">从零开始配置Webpack，讲解入口出口、loader、plugin等核心概念，解决前端项目打包的常见问题。</p>
+                    <a href="#" class="read-more">阅读更多</a>
+                </div>
+                <!-- 文章4 -->
+                <div class="article-card">
+                    <h3 class="article-title">我的前端学习路线总结</h3>
+                    <p class="article-date">2025-12-20</p>
+                    <p class="article-desc">分享我从零基础到入门前端的学习路径，推荐优质学习资源和避坑指南，适合新手参考。</p>
+                    <a href="#" class="read-more">阅读更多</a>
+                </div>
+                <!-- 文章5 -->
+                <div class="article-card">
+                    <h3 class="article-title">CSS动画实现炫酷按钮效果</h3>
+                    <p class="article-date">2025-12-15</p>
+                    <p class="article-desc">利用CSS3的transition和animation属性，制作5种不同风格的炫酷按钮hover动画，提升页面交互感。</p>
+                    <a href="#" class="read-more">阅读更多</a>
+                </div>
+                <!-- 文章6 -->
+                <div class="article-card">
+                    <h3 class="article-title">Vue3 组合式API实战教程</h3>
+                    <p class="article-date">2025-12-10</p>
+                    <p class="article-desc">结合TodoList案例，讲解Vue3的setup、ref、reactive等组合式API的使用方式，对比Options API的差异。</p>
+                    <a href="#" class="read-more">阅读更多</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 技能/兴趣标签云 -->
+    <section class="tags-section">
+        <div class="container">
+            <h2 class="section-title">我的标签</h2>
+            <div class="tag-cloud">
+                <span class="tag">HTML5</span>
+                <span class="tag">CSS3</span>
+                <span class="tag">JavaScript</span>
+                <span class="tag">Vue3</span>
+                <span class="tag">React</span>
+                <span class="tag">Webpack</span>
+                <span class="tag">前端工程化</span>
+                <span class="tag">响应式布局</span>
+                <span class="tag">拍摄</span>
+                <span class="tag">游戏</span>
+                <span class="tag">旅行</span>
+                <span class="tag">健身</span>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- 汉堡菜单交互脚本 -->
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const mainNav = document.getElementById('mainNav');
+
+        hamburger.addEventListener('click', () => {
+            mainNav.classList.toggle('active');
+            // 切换汉堡/关闭图标
+            const icon = hamburger.querySelector('i');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-times');
+        });
+    </script>
+</body>
+</html>

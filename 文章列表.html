@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章列表 - 我的个人博客</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        :root {
+            --primary: #2d3748;
+            --accent: #4299e1;
+            --light-gray: #f7fafc;
+            --gray: #718096;
+            --border: #e2e8f0;
+        }
+        /* 导航栏样式 */
+        .navbar {
+            background: var(--primary);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .nav-menu {
+            display: flex;
+            list-style: none;
+        }
+        .nav-item {
+            margin-left: 2rem;
+        }
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: color 0.3s;
+        }
+        .nav-link.active {
+            color: var(--accent);
+        }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent);
+        }
+        .hamburger {
+            display: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* 页面标题区 */
+        .page-header {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+        .page-title {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        .page-desc {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 主内容容器 */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        /* 筛选区样式 */
+        .filter-section {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .filter-title {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            outline: none;
+            color: var(--primary);
+            min-width: 120px;
+        }
+        .tag-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .tag-btn {
+            padding: 0.3rem 0.8rem;
+            border: 1px solid var(--accent);
+            background: transparent;
+            color: var(--accent);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tag-btn.active {
+            background: var(--accent);
+            color: #fff;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+        .search-input {
+            width: 100%;
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .search-input:focus {
+            border-color: var(--accent);
+        }
+        .search-icon {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        /* 文章列表区 */
+        .article-list {
+            list-style: none;
+        }
+        .article-item {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: box-shadow 0.3s;
+        }
+        .article-item:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .article-category {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-bottom: 0.8rem;
+        }
+        .article-title {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+            text-decoration: none;
+            display: block;
+            transition: color 0.3s;
+        }
+        .article-title:hover {
+            color: var(--accent);
+        }
+        .article-excerpt {
+            color: var(--gray);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .article-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        .meta-info {
+            display: flex;
+            gap: 1rem;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* 分页组件 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+        .page-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--primary);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .page-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+        .page-btn:hover:not(:disabled) {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        .sidebar-widget {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+        .widget-title {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent);
+        }
+        .hot-articles {
+            list-style: none;
+        }
+        .hot-item {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px dashed var(--border);
+        }
+        .hot-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .hot-title {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s;
+            display: -webkit-box ;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .hot-title:hover {
+            color: var(--accent);
+        }
+        .hot-meta {
+            color: var(--gray);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        .category-stats {
+            list-style: none;
+        }
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed var(--border);
+        }
+        .category-item:last-child {
+            border-bottom: none;
+        }
+        .category-name {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .category-name:hover {
+            color: var(--accent);
+        }
+        .category-count {
+            background: var(--accent);
+            color: #fff;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        /* 页脚样式 */
+        .footer {
+            background: var(--primary);
+            color: #fff;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .footer-desc {
+            margin-bottom: 1rem;
+            color: #cbd5e0;
+        }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .footer-link {
+            color: #cbd5e0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .footer-link:hover {
+            color: var(--accent);
+        }
+        .copyright {
+            color: #a0aec0;
+            font-size: 0.9rem;
+        }
+
+        /* 响应式布局 */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--primary);
+                flex-direction: column;
+                padding: 1rem 2rem;
+                gap: 1rem;
+            }
+            .nav-menu.show {
+                display: flex;
+            }
+            .nav-item {
+                margin-left: 0;
+            }
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+            .page-title {
+                font-size: 2rem;
+            }
+            .filter-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .search-box {
+                width: 100%;
+            }
+        }
+    </style>
+    <!-- 引入Font Awesome图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">我的博客</a>
+            <div class="hamburger" id="hamburger">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">首页</a>
+                </li>
+                <li class="nav-item">
+                    <a href="文章列表.html" class="nav-link active">文章列表</a>
+                </li>
+                <li class="nav-item">
+                    <a href="作品集.html" class="nav-link">作品集</a>
+                </li>
+                <li class="nav-item">
+                    <a href="关于我.html" class="nav-link">关于我</a>
+                </li>
+                <li class="nav-item">
+                    <a href="文章详情.html" class="nav-link">文章详情</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 页面标题区 -->
+    <header class="page-header">
+        <h1 class="page-title">所有文章</h1>
+        <p class="page-desc">思想的轨迹，技术的沉淀，在这里记录每一次学习与思考的瞬间</p>
+    </header>
+
+    <!-- 主内容容器 -->
+    <div class="main-container">
+        <!-- 左侧内容区 -->
+        <div class="content-area">
+            <!-- 筛选区 -->
+            <section class="filter-section">
+                <h2 class="filter-title">文章筛选</h2>
+                <div class="filter-controls">
+                    <select class="filter-select" id="categorySelect">
+                        <option value="all">全部分类</option>
+                        <option value="frontend">前端开发</option>
+                        <option value="essay">随笔感悟</option>
+                        <option value="technology">技术杂谈</option>
+                    </select>
+                    <div class="tag-filter">
+                        <button class="tag-btn active" data-tag="all">全部标签</button>
+                        <button class="tag-btn" data-tag="html">HTML</button>
+                        <button class="tag-btn" data-tag="css">CSS</button>
+                        <button class="tag-btn" data-tag="js">JavaScript</button>
+                        <button class="tag-btn" data-tag="vue">Vue</button>
+                    </div>
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" id="searchInput" placeholder="搜索文章标题...">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 文章列表区 -->
+            <ul class="article-list" id="articleList">
+                <!-- 文章项由JavaScript动态生成 -->
+            </ul>
+
+            <!-- 分页组件 -->
+            <div class="pagination" id="pagination">
+                <button class="page-btn" id="prevPage" disabled>上一页</button>
+                <!-- 页码按钮由JavaScript动态生成 -->
+                <button class="page-btn" id="nextPage">下一页</button>
+            </div>
+        </div>
+
+        <!-- 右侧侧边栏 -->
+        <aside class="sidebar">
+            <!-- 热门文章 -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">热门文章</h3>
+                <ul class="hot-articles">
+                    <li class="hot-item">
+                        <a href="#" class="hot-title">HTML5语义化布局实战指南</a>
+                        <div class="hot-meta">2026-01-05 · 2.5k阅读</div>
+                    </li>
+                    <li class="hot-item">
+                        <a href="#" class="hot-title">CSS3 Grid布局从入门到精通</a>
+                        <div class="hot-meta">2026-01-03 · 2.2k阅读</div>
+                    </li>
+                    <li class="hot-item">
+                        <a href="#" class="hot-title">JavaScript异步编程的三种方式</a>
+                        <div class="hot-meta">2026-01-01 · 1.8k阅读</div>
+                    </li>
+                    <li class="hot-item">
+                        <a href="#" class="hot-title">Vue3组合式API实战案例</a>
+                        <div class="hot-meta">2025-12-28 · 1.5k阅读</div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 分类统计 -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">文章分类统计</h3>
+                <ul class="category-stats">
+                    <li class="category-item">
+                        <a href="#" class="category-name">前端开发</a>
+                        <span class="category-count">12</span>
+                    </li>
+                    <li class="category-item">
+                        <a href="#" class="category-name">随笔感悟</a>
+                        <span class="category-count">8</span>
+                    </li>
+                    <li class="category-item">
+                        <a href="#" class="category-name">技术杂谈</a>
+                        <span class="category-count">5</span>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-container">
+            <p class="footer-desc">用代码记录成长，用文字分享知识</p>
+            <div class="footer-links">
+                <a href="index.html" class="footer-link">首页</a>
+                <a href="文章列表.html" class="footer-link">文章列表</a>
+                <a href="作品集.html" class="footer-link">作品集</a>
+                <a href="关于我.html" class="footer-link">关于我</a>
+                <a href="文章详情.html" class="footer-link">文章详情</a>
+            </div>
+            <p class="copyright">© 2026 我的个人博客 | 基于HTML5 + CSS3开发</p>
+        </div>
+    </footer>
+
+    <script>
+        // 模拟文章数据
+        const articleData = [
+            {
+                id: 1,
+                title: "HTML5语义化布局实战指南",
+                excerpt: "本文详细讲解HTML5的语义化标签使用场景，结合实战案例演示如何搭建结构清晰的网页布局，让你的页面更具可读性和SEO友好性。",
+                category: "前端开发",
+                categorySlug: "frontend",
+                tags: ["html", "语义化"],
+                date: "2026-01-05",
+                views: 2568,
+                comments: 32
+            },
+            {
+                id: 2,
+                title: "CSS3 Grid布局从入门到精通",
+                excerpt: "Grid布局是CSS3中最强大的布局系统，本文从基础语法到高级应用，通过多个案例带你掌握Grid布局的核心用法。",
+                category: "前端开发",
+                categorySlug: "frontend",
+                tags: ["css", "grid"],
+                date: "2026-01-03",
+                views: 2245,
+                comments: 28
+            },
+            {
+                id: 3,
+                title: "JavaScript异步编程的三种方式",
+                excerpt: "异步编程是JavaScript的核心知识点，本文详解回调函数、Promise和async/await三种异步编程方式的优缺点及使用场景。",
+                category: "前端开发",
+                categorySlug: "frontend",
+                tags: ["js", "异步"],
+                date: "2026-01-01",
+                views: 1890,
+                comments: 45
+            },
+            {
+                id: 4,
+                title: "Vue3组合式API实战案例",
+                excerpt: "Vue3的组合式API带来了更灵活的代码组织方式，本文通过一个实战项目演示如何使用setup、ref、reactive等API开发前端应用。",
+                category: "前端开发",
+                categorySlug: "frontend",
+                tags: ["vue", "js"],
+                date: "2025-12-28",
+                views: 1567,
+                comments: 21
+            },
+            {
+                id: 5,
+                title: "程序员的成长之路：我的自学经验",
+                excerpt: "作为一名自学前端的程序员，分享我的学习方法、资源推荐和踩坑经历，希望能给正在学习的你一些启发。",
+                category: "随笔感悟",
+                categorySlug: "essay",
+                tags: ["成长", "自学"],
+                date: "2025-12-25",
+                views: 1234,
+                comments: 18
+            },
+            {
+                id: 6,
+                title: "技术博客写作的那些事",
+                excerpt: "为什么要写技术博客？如何写出有价值的技术文章？本文分享我的写作心得和技巧，帮助你开启技术写作之路。",
+                category: "随笔感悟",
+                categorySlug: "essay",
+                tags: ["写作", "分享"],
+                date: "2025-12-20",
+                views: 987,
+                comments: 12
+            },
+            {
+                id: 7,
+                title: "Web前端的未来发展趋势",
+                excerpt: "从WebAssembly到AI前端框架，从低代码到跨端开发，本文分析Web前端的未来发展方向，帮助你把握技术趋势。",
+                category: "技术杂谈",
+                categorySlug: "technology",
+                tags: ["趋势", "前端"],
+                date: "2025-12-15",
+                views: 1678,
+                comments: 36
+            },
+            {
+                id: 8,
+                title: "前端性能优化的10个实用技巧",
+                excerpt: "页面加载慢、交互卡顿？本文分享10个前端性能优化的实用技巧，从资源加载到代码执行，全方位提升网页性能。",
+                category: "技术杂谈",
+                categorySlug: "technology",
+                tags: ["性能", "优化", "js"],
+                date: "2025-12-10",
+                views: 1456,
+                comments: 24
+            }
+        ];
+
+        // 分页配置
+        const pageSize = 3; // 每页显示文章数
+        let currentPage = 1;
+        let filteredArticles = [...articleData];
+
+        // 渲染文章列表
+        function renderArticles() {
+            const articleList = document.getElementById('articleList');
+            articleList.innerHTML = '';
+
+            // 计算分页数据
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const paginatedArticles = filteredArticles.slice(start, end);
+
+            // 生成文章项
+            paginatedArticles.forEach(article => {
+                const li = document.createElement('li');
+                li.className = 'article-item';
+                li.innerHTML = `
+                    <span class="article-category">${article.category}</span>
+                    <a href="article-detail.html?id=${article.id}" class="article-title">${article.title}</a>
+                    <p class="article-excerpt">${article.excerpt}</p>
+                    <div class="article-meta">
+                        <div class="meta-info">
+                            <div class="meta-item"><i class="far fa-calendar"></i> ${article.date}</div>
+                            <div class="meta-item"><i class="far fa-eye"></i> ${article.views}</div>
+                            <div class="meta-item"><i class="far fa-comment"></i> ${article.comments}</div>
+                        </div>
+                        <div class="meta-tags">${article.tags.map(tag => `#${tag}`).join(' ')}</div>
+                    </div>
+                `;
+                articleList.appendChild(li);
+            });
+
+            // 渲染分页
+            renderPagination();
+        }
+
+        // 渲染分页组件
+        function renderPagination() {
+            const pagination = document.getElementById('pagination');
+            const prevPage = document.getElementById('prevPage');
+            const nextPage = document.getElementById('nextPage');
+            
+            // 移除现有页码按钮
+            const pageButtons = pagination.querySelectorAll('.page-btn:not(#prevPage):not(#nextPage)');
+            pageButtons.forEach(btn => btn.remove());
+
+            const totalPages = Math.ceil(filteredArticles.length / pageSize);
+
+            // 添加页码按钮
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                pageBtn.textContent = i;
+                pageBtn.dataset.page = i;
+                pageBtn.addEventListener('click', () => {
+                    currentPage = i;
+                    renderArticles();
+                });
+                pagination.insertBefore(pageBtn, nextPage);
+            }
+
+            // 禁用/启用上一页/下一页
+            prevPage.disabled = currentPage === 1;
+            nextPage.disabled = currentPage === totalPages;
+
+            // 上一页/下一页事件
+            prevPage.onclick = () => {
+                currentPage--;
+                renderArticles();
+            };
+            nextPage.onclick = () => {
+                currentPage++;
+                renderArticles();
+            };
+        }
+
+        // 筛选功能
+        function initFilters() {
+            // 分类筛选
+            const categorySelect = document.getElementById('categorySelect');
+            categorySelect.addEventListener('change', filterArticles);
+
+            // 标签筛选
+            const tagBtns = document.querySelectorAll('.tag-btn');
+            tagBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tagBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    filterArticles();
+                });
+            });
+
+            // 搜索筛选
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', filterArticles);
+        }
+
+        // 筛选文章逻辑
+        function filterArticles() {
+            const category = document.getElementById('categorySelect').value;
+            const activeTag = document.querySelector('.tag-btn.active').dataset.tag;
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+
+            filteredArticles = articleData.filter(article => {
+                // 分类筛选
+                const categoryMatch = category === 'all' || article.categorySlug === category;
+                // 标签筛选
+                const tagMatch = activeTag === 'all' || article.tags.includes(activeTag);
+                // 搜索筛选
+                const searchMatch = article.title.toLowerCase().includes(searchText);
+
+                return categoryMatch && tagMatch && searchMatch;
+            });
+
+            // 重置当前页
+            currentPage = 1;
+            renderArticles();
+        }
+
+        // 移动端导航栏
+        function initMobileNav() {
+            const hamburger = document.getElementById('hamburger');
+            const navMenu = document.getElementById('navMenu');
+            hamburger.addEventListener('click', () => {
+                navMenu.classList.toggle('show');
+            });
+        }
+
+        // 初始化
+        window.onload = () => {
+            initMobileNav();
+            initFilters();
+            renderArticles();
+        };
+    </script>
+</body>
+</html>
